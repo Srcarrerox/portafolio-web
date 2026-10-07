@@ -498,7 +498,7 @@ const IMG = {
 
 const T = {
 es:{
-  nav1:"Proyectos",nav2:"Servicios",nav3:"Contacto",gyro:"Activar movimiento",gyroOff:"Sin sensor de movimiento. Abre la página por HTTPS en tu navegador y permite «Sensores de movimiento» en los ajustes del sitio. Mientras, la mirada sigue tu dedo.",
+  nav1:"Proyectos",nav2:"Servicios",nav3:"Contacto",gyro:"Activar giroscopio",gyroOff:"Sin sensor de movimiento. Abre la página por HTTPS en tu navegador y permite «Sensores de movimiento» en los ajustes del sitio. Mientras, la mirada sigue tu dedo.",
   role1:"Diseñador gráfico",role2:"Ingeniero en Sistemas",
   tagAbout:"Sobre mí",
   statement:"Transformo <em>conceptos en un impacto visual.</em>",
@@ -529,7 +529,7 @@ es:{
   tagWork:"Proyectos"
 },
 en:{
-  nav1:"Work",nav2:"Services",nav3:"Contact",gyro:"Enable motion",gyroOff:"No motion sensor. Open the page over HTTPS in your browser and allow “Motion sensors” in the site settings. Meanwhile, the gaze follows your finger.",
+  nav1:"Work",nav2:"Services",nav3:"Contact",gyro:"Enable gyroscope",gyroOff:"No motion sensor. Open the page over HTTPS in your browser and allow “Motion sensors” in the site settings. Meanwhile, the gaze follows your finger.",
   role1:"Graphic designer",role2:"Systems Engineer",
   tagAbout:"About",
   statement:"I turn <em>concepts into visual impact.</em>",
@@ -647,38 +647,24 @@ if(IMG.hero){
   };
   window.addEventListener("pointermove", e=>{ if(e.pointerType !== "touch") look(e.clientX,e.clientY); });
 
-  const GYRO_ENTER = 5, GYRO_LEAVE = 9;
-  const GYRO_RANGE_X = 22, GYRO_RANGE_Y = 20;
+  const GYRO_ENTER = 6, GYRO_LEAVE = 10, GYRO_TAU = 3;
   const GYRO_FLIP = { x:false, y:false };
   const gyroBtn = document.getElementById("gyro"), gyroMsg = document.getElementById("gyroMsg");
-  let gyroOn = false, src = null, base = null, touchFallback = false, lastSensor = 0;
+  let gyroOn = false, src = null, base = null, last = 0, touchFallback = false;
 
   const feed = (x,y)=>{
     const a = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
     if(a === 90){ [x,y] = [y,-x]; }
     else if(a === 270 || a === -90){ [x,y] = [-y,x]; }
     else if(Math.abs(a) === 180){ [x,y] = [-x,-y]; }
-
-    // La referencia se fija al empezar. Antes el código la perseguía
-    // continuamente y eso hacía que x-base/y-base tendiera casi a cero.
-    if(!base){
-      base = { x, y };
-      lastSensor = performance.now();
-      return;
+    const now = performance.now();
+    if(!base) base = { x, y };
+    else {
+      const k = 1 - Math.exp(-((now-last)/1000)/GYRO_TAU);
+      base.x += (x-base.x)*k; base.y += (y-base.y)*k;
     }
-
-    lastSensor = performance.now();
-
-    // Diferencia respecto a la posición inicial, limitada para evitar saltos.
-    const dx = Math.max(-GYRO_RANGE_X, Math.min(GYRO_RANGE_X, x - base.x));
-    const dy = Math.max(-GYRO_RANGE_Y, Math.min(GYRO_RANGE_Y, y - base.y));
-
-    aim(
-      dx * (GYRO_FLIP.x ? -1 : 1),
-      dy * (GYRO_FLIP.y ? -1 : 1),
-      GYRO_ENTER,
-      GYRO_LEAVE
-    );
+    last = now;
+    aim((x-base.x)*(GYRO_FLIP.x ? -1 : 1), (y-base.y)*(GYRO_FLIP.y ? -1 : 1), GYRO_ENTER, GYRO_LEAVE);
   };
   const onOri = name => e=>{
     if(e.beta == null || e.gamma == null || (src && src !== name)) return;
@@ -691,77 +677,32 @@ if(IMG.hero){
     src = "motion"; gyroMsg.hidden = true;
     feed(Math.atan2(-g.x, Math.hypot(g.y, g.z))*180/Math.PI, Math.atan2(g.y, g.z)*180/Math.PI);
   };
-  const noSensor = ()=>{
-    gyroBtn.hidden = false;
-    gyroMsg.hidden = true;
-    touchFallback = true;
-  };
+  const noSensor = ()=>{ gyroBtn.hidden = true; gyroMsg.hidden = false; touchFallback = true; };
   const onTouch = e=>{ if(touchFallback && e.touches[0]) look(e.touches[0].clientX, e.touches[0].clientY); };
   window.addEventListener("touchstart", onTouch, { passive:true });
   window.addEventListener("touchmove", onTouch, { passive:true });
   gyroMsg.addEventListener("click", ()=>{ gyroMsg.hidden = true; });
 
-  gyroBtn.addEventListener("click", async ()=>{
-    // Some browsers/embedded environments only expose motion after a user gesture.
-    // On iOS this also requests the required permission.
-    try{
-      if(typeof DeviceOrientationEvent !== "undefined" &&
-         typeof DeviceOrientationEvent.requestPermission === "function"){
-        const p = await DeviceOrientationEvent.requestPermission();
-        if(p !== "granted"){ noSensor(); return; }
-      }
-      if(typeof DeviceMotionEvent !== "undefined" &&
-         typeof DeviceMotionEvent.requestPermission === "function"){
-        const p = await DeviceMotionEvent.requestPermission();
-        if(p !== "granted"){ noSensor(); return; }
-      }
-    }catch(e){
-      noSensor();
-      return;
-    }
-    startGyro();
-  });
-
   const startGyro = ()=>{
-    gyroOn = true;
-    gyroBtn.hidden = true;
-    gyroMsg.hidden = true;
-    touchFallback = false;
-    base = null;
-    src = null;
-
-    if(!window.isSecureContext){
-      noSensor();
-      return;
-    }
-
-    window.removeEventListener("deviceorientation", onOri("ori"));
-    window.removeEventListener("deviceorientationabsolute", onOri("abs"));
-    window.removeEventListener("devicemotion", onMotion);
-
-    window.addEventListener("deviceorientation", onOri("ori"), { passive:true });
-    window.addEventListener("deviceorientationabsolute", onOri("abs"), { passive:true });
-
-    setTimeout(()=>{
-      if(!src) window.addEventListener("devicemotion", onMotion, { passive:true });
-    }, 700);
-
-    setTimeout(()=>{
-      if(!src) noSensor();
-    }, 2200);
+    if(gyroOn) return; gyroOn = true; gyroBtn.hidden = true;
+    if(!window.isSecureContext){ noSensor(); return; }
+    window.addEventListener("deviceorientation", onOri("ori"));
+    window.addEventListener("deviceorientationabsolute", onOri("abs"));
+    setTimeout(()=>{ if(!src) window.addEventListener("devicemotion", onMotion); }, 1200);
+    setTimeout(()=>{ if(!src) noSensor(); }, 3500);
   };
 
-  // Móvil: intentamos automáticamente. Si Chrome no entrega sensores,
-  // aparece un botón pequeño para reintentar mediante gesto del usuario.
+  // Sin botón molesto: en Android arranca solo; en iOS (requiere permiso) solo usa touch
   const phone = matchMedia("(pointer: coarse)").matches || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   if(phone){
     const DOE = window.DeviceOrientationEvent;
     if(DOE && typeof DOE.requestPermission === "function"){
-      // iOS: el permiso debe nacer de un gesto.
-      gyroBtn.hidden = false;
+      // iOS exige gesto + permiso → no pedimos, usamos solo touch
       touchFallback = true;
+      gyroBtn.hidden = true;
+      gyroMsg.hidden = true;
     } else {
-      startGyro(); // Android/Chrome: normalmente no requiere prompt.
+      startGyro(); // Android y otros: arranca sin permiso
     }
   }
 }
@@ -772,9 +713,8 @@ document.addEventListener("touchmove", e=>{ if(e.touches.length > 1) e.preventDe
 <script>
 /* TRANSICIÓN HERO → SOBRE MÍ */
 (()=>{try{
-const MOBILE_FX = matchMedia("(max-width:900px)").matches;
 const FX={rug:1.45,grosor:3,escala:4.1,halo:3, sens:.0007, tsens:.0028};
-if(MOBILE_FX || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 const cv=document.getElementById("fx"), gl=cv.getContext("webgl",{alpha:true,premultipliedAlpha:true});
 if(!gl) return;
 const sobre=document.getElementById("sobre"), clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
