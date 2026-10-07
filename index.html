@@ -40,14 +40,14 @@ nav .links{margin-right:100px}
 .hero{--ph:86%;position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:flex-end;background:var(--w);color:var(--k)}
 .hero h1{position:absolute;left:0;right:0;top:18%;text-align:center;font-weight:700;font-size:clamp(46px,13vw,220px);line-height:.94;letter-spacing:-.035em;z-index:1}
 .hero .photo{position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:var(--ph);width:auto;z-index:2;object-fit:contain;filter:grayscale(1) contrast(1.05)}
-.hero .role{position:absolute;right:clamp(18px,4vw,56px);bottom:7%;z-index:1;text-align:right;font-weight:700;font-size:clamp(22px,3.8vw,56px);line-height:1;letter-spacing:-.02em;color:var(--g)}
-.hero .soc{position:absolute;left:clamp(18px,4vw,56px);bottom:7%;z-index:3;display:grid;gap:7px;font-size:13px;font-weight:600}
+.hero .role{position:absolute;right:clamp(18px,4vw,56px);bottom:14%;z-index:4;text-align:right;font-weight:700;font-size:clamp(18px,3vw,48px);line-height:1;letter-spacing:-.02em;color:var(--g);white-space:nowrap}
+.hero .role-left{position:absolute;left:clamp(18px,4vw,56px);bottom:14%;z-index:4;text-align:left;font-weight:700;font-size:clamp(18px,3vw,48px);line-height:1;letter-spacing:-.02em;color:var(--g);white-space:nowrap}
+.hero .soc{position:absolute;left:0;right:0;bottom:5%;z-index:4;display:flex;justify-content:space-between;align-items:center;padding:0 clamp(18px,4vw,56px);font-size:13px;font-weight:600}
 .hero .soc a:hover{text-decoration:underline;text-decoration-color:var(--g);text-underline-offset:4px}
-.hero .role-left{font-weight:700;font-size:clamp(18px,3vw,42px);line-height:1.05;letter-spacing:-.02em;color:var(--k);margin-bottom:14px;max-width:12ch}
+.hero .soc a.soc-center{color:#fff}
 .hero .front{position:absolute;inset:0;z-index:3;pointer-events:none;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:auto var(--ph);mask-size:auto var(--ph);-webkit-mask-position:50% 100%;mask-position:50% 100%}
 .hero .neg{position:absolute;inset:0;z-index:3;pointer-events:none;mix-blend-mode:difference}
 .hero .neg h1{color:#fff}
-.hero .front .role{color:#fff;opacity:.55}
 
 /* SECTIONS — más aire */
 section{position:relative;z-index:1;border-top:1px solid var(--line);padding:clamp(64px,10vw,130px) 0}
@@ -181,11 +181,32 @@ footer{padding:24px 0;border-top:1px solid var(--line);font-size:12px;color:var(
   .g4{grid-template-columns:repeat(2,1fr)}
   .g3{grid-template-columns:1fr 1fr}
   .g2,.pair{grid-template-columns:1fr}
-  .hero{--ph:68%}
+  /* HERO MOBILE: el escenario queda fijo para que la foto y sus efectos no salten */
+  .hero{
+    --ph:68%;
+    height:100svh;
+    min-height:100svh;
+    max-height:100svh;
+    isolation:isolate;
+  }
   .hero h1{top:13%}
   nav .links{display:none}
   .tools-zone{height:clamp(210px,48vw,280px)}
   .row{grid-template-columns:1fr;gap:4px}
+  /* Títulos centrados, uno debajo del otro en móvil */
+  .hero .role,
+  .hero .role-left{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    text-align:center;
+    white-space:nowrap;
+    font-size:clamp(16px,4.5vw,28px);
+    max-width:92vw;
+  }
+  .hero .role{bottom:18%}       /* Diseñador arriba */
+  .hero .role-left{bottom:13%}  /* Ingeniero abajo */
+  .hero .soc{bottom:4%;font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
@@ -195,14 +216,28 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjus
 nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18px,4vw,56px),env(safe-area-inset-left));padding-right:max(clamp(18px,4vw,56px),env(safe-area-inset-right))}
 #lang{top:calc(12px + env(safe-area-inset-top));right:max(clamp(18px,4vw,56px),env(safe-area-inset-right))}
 .wrap{padding-left:max(clamp(18px,4vw,56px),env(safe-area-inset-left));padding-right:max(clamp(18px,4vw,56px),env(safe-area-inset-right))}
-.hero .soc{left:max(clamp(18px,4vw,56px),env(safe-area-inset-left))}
+.hero .soc{padding-left:max(clamp(18px,4vw,56px),env(safe-area-inset-left));padding-right:max(clamp(18px,4vw,56px),env(safe-area-inset-right))}
 .hero .role{right:max(clamp(18px,4vw,56px),env(safe-area-inset-right))}
+.hero .role-left{left:max(clamp(18px,4vw,56px),env(safe-area-inset-left))}
 .hero .photo{-webkit-user-drag:none;-webkit-touch-callout:none;user-select:none}
 #gyro{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top));transform:translateX(-50%);z-index:20;background:var(--g);color:var(--k);border:0;border-radius:99px;padding:7px 14px;font:inherit;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer}
 #gyro[hidden]{display:none}
 #gyroMsg{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top));transform:translateX(-50%);z-index:20;width:max-content;max-width:min(86vw,340px);background:var(--k);color:var(--w);border-radius:14px;padding:10px 14px;font-size:12px;font-weight:600;line-height:1.4;text-align:center;cursor:pointer}
 #gyroMsg[hidden]{display:none}
-@media(max-width:360px){.hero .role,.hero .role-left{font-size:17px}}
+@media(max-width:900px){
+  .hero .role,
+  .hero .role-left{
+    left:50% !important;
+    right:auto !important;
+    transform:translateX(-50%);
+    text-align:center;
+  }
+}
+@media(max-width:360px){
+  .hero .role,.hero .role-left{font-size:15px}
+  .hero .role{bottom:15.5%}
+  .hero .role-left{bottom:11%}
+}
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:10;display:none;pointer-events:none}
 
 /* ===== PREMIUM INTERACTIONS ===== */
@@ -250,16 +285,14 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
   <div class="fig" data-key="hero" style="position:absolute;inset:0;background:none;z-index:2;pointer-events:none">
     <img class="photo" data-img="hero" alt="Fernando Carrero">
   </div>
-  <div class="front" id="front">
-    <div class="role" data-k="role1"></div>
-  </div>
+  <div class="front" id="front"></div>
+  <div class="role-left" data-k="role2"></div>
+  <div class="role" data-k="role1"></div>
   <div class="soc">
-    <div class="role-left" data-k="role2"></div>
     <a href="mailto:facarreronava@gmail.com">Email</a>
-    <a href="https://www.behance.net/ffernando" target="_blank" rel="noopener">Behance</a>
+    <a class="soc-center" href="https://www.behance.net/ffernando" target="_blank" rel="noopener">Behance</a>
     <a href="https://instagram.com/ferxdesing" target="_blank" rel="noopener">Instagram</a>
   </div>
-  <div class="role" data-k="role1"></div>
   <button id="gyro" type="button" hidden data-k="gyro"></button>
   <div id="gyroMsg" hidden data-k="gyroOff"></div>
 </header>
@@ -570,16 +603,29 @@ const LOOK = {
 const LOOK_ORDER = ["derecha","abajo-derecha","abajo","abajo-izquierda","izquierda","arriba-izquierda","arriba","arriba-derecha"];
 const LOOK_ORIGIN = { x: .5, y: .35 };
 const LOOK_ENTER = .08, LOOK_LEAVE = .12;
-const LOOK_SCALE = { centro: .92, abajo: .95 };
+// Todas las poses usan exactamente la misma escala y anclaje.
+// Antes centro=.92 y algunas poses cambiaban de tamaño, provocando que
+// Fernando pareciera subir/bajar en móvil y que la máscara perdiera alineación.
+const LOOK_SCALE = {
+  centro: 1, izquierda: 1, derecha: 1, arriba: 1, abajo: 1,
+  "arriba-izquierda": 1, "arriba-derecha": 1,
+  "abajo-derecha": 1, "abajo-izquierda": 1
+};
 
 if(IMG.hero){
   const photo = document.querySelector(".hero .photo"), front = document.getElementById("front");
   let cur = "centro", inCenter = true;
   Object.values(LOOK).forEach(src=>{ const i = new Image(); i.src = src; });
   const fit = k=>{
-    const h = "calc(var(--ph) * "+(LOOK_SCALE[k] || 1)+")";
+    // Mantener un único marco geométrico para todas las miradas.
+    // Cambia únicamente el PNG; no cambia posición, tamaño ni máscara.
+    const h = "var(--ph)";
     photo.style.height = h;
-    front.style.webkitMaskSize = front.style.maskSize = "auto "+h;
+    photo.style.bottom = "0px";
+    photo.style.left = "50%";
+    photo.style.transform = "translateX(-50%)";
+    front.style.webkitMaskSize = front.style.maskSize = "auto " + h;
+    front.style.webkitMaskPosition = front.style.maskPosition = "50% 100%";
   };
   const setLook = k=>{
     if(k === cur) return; cur = k;
