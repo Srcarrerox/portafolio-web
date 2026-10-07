@@ -4,14 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fernando Carrero — Portafolio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M9 7h14v3.2H12.6v4.4H21v3H12.6V25H9V7z' fill='%2385C528'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M9 7h14v3.2H12.6v4.4H21v3H12.6V25H9V7z' fill='%2385C528'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--g:#85C528;--w:#fff;--k:#000;--dim:rgba(255,255,255,.62);--line:rgba(255,255,255,.14)}
 *{box-sizing:border-box;margin:0}
-html{scroll-behavior:smooth}
-body{background:var(--k);color:var(--w);font-family:'Montserrat',system-ui,sans-serif;font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;background:#000}
+body{background:transparent;color:var(--w);font-family:'Montserrat',system-ui,sans-serif;font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased}
+#matrixBg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0;transition:opacity .6s ease}
+#matrixBg.on{opacity:.22}
+footer{position:relative;z-index:1}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible{outline:2px solid var(--g);outline-offset:4px}
 ::selection{background:var(--g);color:var(--k)}
@@ -34,21 +40,17 @@ nav .links{margin-right:100px}
 .hero{--ph:86%;position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:flex-end;background:var(--w);color:var(--k)}
 .hero h1{position:absolute;left:0;right:0;top:18%;text-align:center;font-weight:700;font-size:clamp(46px,13vw,220px);line-height:.94;letter-spacing:-.035em;z-index:1}
 .hero .photo{position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:var(--ph);width:auto;z-index:2;object-fit:contain;filter:grayscale(1) contrast(1.05)}
-.hero .role{position:absolute;right:clamp(18px,4vw,56px);bottom:7%;z-index:1;text-align:right;font-weight:700;font-size:clamp(22px,3.8vw,56px);line-height:1;letter-spacing:-.02em;color:var(--k)}
-.hero .role span{display:block;color:var(--g)}
+.hero .role{position:absolute;right:clamp(18px,4vw,56px);bottom:7%;z-index:1;text-align:right;font-weight:700;font-size:clamp(22px,3.8vw,56px);line-height:1;letter-spacing:-.02em;color:var(--g)}
 .hero .soc{position:absolute;left:clamp(18px,4vw,56px);bottom:7%;z-index:3;display:grid;gap:7px;font-size:13px;font-weight:600}
 .hero .soc a:hover{text-decoration:underline;text-decoration-color:var(--g);text-underline-offset:4px}
+.hero .role-left{font-weight:700;font-size:clamp(18px,3vw,42px);line-height:1.05;letter-spacing:-.02em;color:var(--k);margin-bottom:14px;max-width:12ch}
 .hero .front{position:absolute;inset:0;z-index:3;pointer-events:none;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:auto var(--ph);mask-size:auto var(--ph);-webkit-mask-position:50% 100%;mask-position:50% 100%}
 .hero .neg{position:absolute;inset:0;z-index:3;pointer-events:none;mix-blend-mode:difference}
 .hero .neg h1{color:#fff}
-.hero .front .role,.hero .front .role span{color:#fff}
-.hero .role .sl{display:inline}
-.hero .role.only2 .sl,.hero .role.only2 span[data-k=role1],.hero .role.only1 span[data-k=role2]{visibility:hidden}
-.hero .role.only1{z-index:3}
-.hero .front .role{opacity:.55}
+.hero .front .role{color:#fff;opacity:.55}
 
 /* SECTIONS — más aire */
-section{border-top:1px solid var(--line);padding:clamp(64px,10vw,130px) 0}
+section{position:relative;z-index:1;border-top:1px solid var(--line);padding:clamp(64px,10vw,130px) 0}
 .tag{color:var(--g);font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:clamp(20px,3vw,36px)}
 .big{font-size:clamp(30px,4.8vw,64px);font-weight:600;line-height:1.08;letter-spacing:-.03em;max-width:18ch}
 .big em{font-style:normal;color:var(--g)}
@@ -66,6 +68,7 @@ section{border-top:1px solid var(--line);padding:clamp(64px,10vw,130px) 0}
   position:relative;width:100%;
   height:clamp(220px,32vw,300px);
   border:1px solid var(--line);border-radius:18px;
+  background-color:#0a0a0a;
   background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1.3px);
   background-size:20px 20px;overflow:hidden;
 }
@@ -120,6 +123,49 @@ section{border-top:1px solid var(--line);padding:clamp(64px,10vw,130px) 0}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.1vw,14px)}
 .pair .fig{aspect-ratio:4/5}
 .cap{font-size:12px;color:var(--dim);margin:7px 0 18px}
+.prompt-set{margin-bottom:clamp(36px,5vw,64px)}
+.prompt-set:last-child{margin-bottom:0}
+.prompt-btn{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+  appearance:none;background:transparent;border:1px solid var(--g);color:var(--g);
+  border-radius:99px;padding:9px 18px;font:600 13px/1 'Montserrat',system-ui,sans-serif;
+  cursor:pointer;transition:background .2s,color .2s;
+}
+.prompt-btn:hover{background:var(--g);color:var(--k)}
+.prompt-modal{
+  position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+  background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  padding:20px;
+}
+.prompt-modal[hidden]{display:none}
+.prompt-modal-box{
+  width:min(92vw,640px);max-height:min(80vh,720px);display:flex;flex-direction:column;
+  background:#0d0d0d;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+}
+.prompt-modal-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--g);
+}
+.prompt-modal-head button{
+  appearance:none;background:none;border:0;color:var(--dim);font-size:22px;line-height:1;
+  cursor:pointer;padding:0 4px;
+}
+.prompt-modal-head button:hover{color:#fff}
+.prompt-code{
+  flex:1;overflow:auto;margin:0;padding:16px 18px;
+  font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:rgba(255,255,255,.82);white-space:pre-wrap;word-break:break-word;
+  background:#0a0a0a;
+}
+.prompt-copy{
+  margin:14px 18px 16px;appearance:none;border:0;border-radius:99px;
+  background:var(--g);color:var(--k);font:700 13px/1 'Montserrat',system-ui,sans-serif;
+  padding:12px 20px;cursor:pointer;transition:opacity .2s;
+}
+.prompt-copy:hover{opacity:.88}
+.prompt-copy.ok{background:#fff}
 
 /* CONTACT */
 .contact a.mail{display:block;font-size:clamp(24px,5.2vw,72px);font-weight:700;letter-spacing:-.035em;line-height:1.05;overflow-wrap:anywhere;transition:color .2s;margin-top:8px}
@@ -156,7 +202,7 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
 #gyro[hidden]{display:none}
 #gyroMsg{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top));transform:translateX(-50%);z-index:20;width:max-content;max-width:min(86vw,340px);background:var(--k);color:var(--w);border-radius:14px;padding:10px 14px;font-size:12px;font-weight:600;line-height:1.4;text-align:center;cursor:pointer}
 #gyroMsg[hidden]{display:none}
-@media(max-width:360px){.hero .role{font-size:17px}}
+@media(max-width:360px){.hero .role,.hero .role-left{font-size:17px}}
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:10;display:none;pointer-events:none}
 
 /* ===== PREMIUM INTERACTIONS ===== */
@@ -189,6 +235,7 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
 </style>
 </head>
 <body>
+<canvas id="matrixBg" aria-hidden="true"></canvas>
 <div id="spotlight" aria-hidden="true"></div>
 
 <div class="navblur"><i></i><i></i><i></i><i></i></div>
@@ -204,15 +251,15 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
     <img class="photo" data-img="hero" alt="Fernando Carrero">
   </div>
   <div class="front" id="front">
-    <div class="role only2"><span class="sl">//</span> <span data-k="role1"></span><span data-k="role2"></span></div>
+    <div class="role" data-k="role1"></div>
   </div>
   <div class="soc">
-    <a href="https://instagram.com/ferxdesing" target="_blank" rel="noopener">Instagram</a>
-    <a href="https://calle114.com" target="_blank" rel="noopener">Calle 114</a>
+    <div class="role-left" data-k="role2"></div>
     <a href="mailto:facarreronava@gmail.com">Email</a>
+    <a href="https://www.behance.net/ffernando" target="_blank" rel="noopener">Behance</a>
+    <a href="https://instagram.com/ferxdesing" target="_blank" rel="noopener">Instagram</a>
   </div>
-  <div class="role only2"><span class="sl"></span> <span data-k="role1"></span><span data-k="role2" style="color:var(--k)"></span></div>
-  <div class="role only1"> <span data-k="role1"></span><span data-k="role2"></span></div>
+  <div class="role" data-k="role1"></div>
   <button id="gyro" type="button" hidden data-k="gyro"></button>
   <div id="gyroMsg" hidden data-k="gyroOff"></div>
 </header>
@@ -329,15 +376,48 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
 
     <div class="project">
       <div class="meta"><h3 data-k="promptTitle"></h3><p data-k="promptDesc"></p></div>
-      <div class="pair">
-        <div><div class="fig" data-key="prompt1o"><img data-img="prompt1o" alt="Original 1"></div><p class="cap" data-k="orig"></p></div>
-        <div><div class="fig" data-key="prompt1r"><img data-img="prompt1r" alt="Resultado 1"></div><p class="cap" data-k="ai"></p></div>
-        <div><div class="fig" data-key="prompt2o"><img data-img="prompt2o" alt="Original 2"></div><p class="cap" data-k="orig"></p></div>
-        <div><div class="fig" data-key="prompt2r"><img data-img="prompt2r" alt="Resultado 2"></div><p class="cap" data-k="ai"></p></div>
+
+      <!-- Prompt 1: Optimus -->
+      <div class="prompt-set">
+        <div class="pair">
+          <div><div class="fig" data-key="prompt1o"><img data-img="prompt1o" alt="Original 1"></div><p class="cap" data-k="orig"></p></div>
+          <div><div class="fig" data-key="prompt1r"><img data-img="prompt1r" alt="Resultado 1"></div><p class="cap" data-k="ai"></p></div>
+        </div>
+        <button type="button" class="prompt-btn" data-prompt="1" data-k="viewPrompt"></button>
+      </div>
+
+      <!-- Prompt 2: Suit / pistol -->
+      <div class="prompt-set">
+        <div class="pair">
+          <div><div class="fig" data-key="prompt2o"><img data-img="prompt2o" alt="Original 2"></div><p class="cap" data-k="orig"></p></div>
+          <div><div class="fig" data-key="prompt2r"><img data-img="prompt2r" alt="Resultado 2"></div><p class="cap" data-k="ai"></p></div>
+        </div>
+        <button type="button" class="prompt-btn" data-prompt="2" data-k="viewPrompt"></button>
+      </div>
+
+      <!-- Prompt 3: Snow -->
+      <div class="prompt-set">
+        <div class="pair">
+          <div><div class="fig" data-key="prompt3o"><img data-img="prompt3o" alt="Original 3"></div><p class="cap" data-k="orig"></p></div>
+          <div><div class="fig" data-key="prompt3r"><img data-img="prompt3r" alt="Resultado 3"></div><p class="cap" data-k="ai"></p></div>
+        </div>
+        <button type="button" class="prompt-btn" data-prompt="3" data-k="viewPrompt"></button>
       </div>
     </div>
   </div>
 </section>
+
+<!-- Modal prompt -->
+<div id="promptModal" class="prompt-modal" hidden>
+  <div class="prompt-modal-box">
+    <div class="prompt-modal-head">
+      <span data-k="promptCodeTitle">Prompt</span>
+      <button type="button" id="promptClose" aria-label="Cerrar">×</button>
+    </div>
+    <pre id="promptCode" class="prompt-code"></pre>
+    <button type="button" id="promptCopy" class="prompt-copy" data-k="copyPrompt">Copiar</button>
+  </div>
+</div>
 
 <!-- CONTACTO -->
 <section id="contacto" class="contact">
@@ -375,7 +455,12 @@ const IMG = {
   poster6: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/paton-con-pan.png",
   poster7: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/bird.png",
   poster8: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/paradoja.png",
-  prompt1o: "", prompt1r: "", prompt2o: "", prompt2r: ""
+  prompt1o: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/orginal%201.jpg",
+  prompt1r: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/prompt%201.jpg",
+  prompt2o: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/original3.jpg",
+  prompt2r: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/prompt%203.jpg",
+  prompt3o: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/original%202.jpg",
+  prompt3r: "https://ik.imagekit.io/arancel/MI%20PORTAFOLIO/prompt2.jpg"
 };
 
 const T = {
@@ -399,6 +484,7 @@ es:{
   posterDesc:"Selección de posters de exploración visual, tipografía y narrativa.",
   promptTitle:"Creador de prompts",promptDesc:"Parto de una imagen original y, con prompts, la llevo a otro escenario o estilo manteniendo el detalle.",
   orig:"Original",ai:"Resultado con IA",
+  viewPrompt:"Ver / copiar prompt",copyPrompt:"Copiar prompt",promptCodeTitle:"Código del prompt",
   tagExp:"Experiencia",
   e1y:"4 años",e1t:"Diseñador gráfico",e1d:"Photoshop, After Effects, Lightroom e Illustrator: desde gráficos y edición de fotos hasta animación de gráficos en movimiento e ilustración vectorial.",
   e2y:"3 años",e2t:"Desarrollador de interfaces gráficas — Sistema de Administración de Fincas",e2d:"Gestioné y desarrollé el diseño de la interfaz de un sistema de administración de fincas, aplicando diseño y usabilidad para mejorar la experiencia del usuario.",
@@ -429,6 +515,7 @@ en:{
   posterDesc:"A selection of posters exploring visuals, typography and narrative.",
   promptTitle:"Prompt creator",promptDesc:"I start from an original image and, through prompts, take it to a new scene or style while keeping the detail.",
   orig:"Original",ai:"AI result",
+  viewPrompt:"View / copy prompt",copyPrompt:"Copy prompt",promptCodeTitle:"Prompt code",
   tagExp:"Experience",
   e1y:"4 years",e1t:"Graphic designer",e1d:"Photoshop, After Effects, Lightroom and Illustrator: from graphics and photo editing to motion graphics and vector illustration.",
   e2y:"3 years",e2t:"GUI developer — Farm Management System",e2d:"Managed and developed the interface design of a farm management system, applying design and usability to improve the user experience.",
@@ -559,15 +646,18 @@ if(IMG.hero){
     setTimeout(()=>{ if(!src) noSensor(); }, 3500);
   };
 
+  // Sin botón molesto: en Android arranca solo; en iOS (requiere permiso) solo usa touch
   const phone = matchMedia("(pointer: coarse)").matches || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   if(phone){
     const DOE = window.DeviceOrientationEvent;
     if(DOE && typeof DOE.requestPermission === "function"){
-      gyroBtn.hidden = false;
-      gyroBtn.addEventListener("click", ()=>{
-        DOE.requestPermission().then(r=>{ if(r === "granted") startGyro(); else noSensor(); }).catch(noSensor);
-      });
-    } else startGyro();
+      // iOS exige gesto + permiso → no pedimos, usamos solo touch
+      touchFallback = true;
+      gyroBtn.hidden = true;
+      gyroMsg.hidden = true;
+    } else {
+      startGyro(); // Android y otros: arranca sin permiso
+    }
   }
 }
 ["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t, e=>e.preventDefault()));
@@ -937,6 +1027,257 @@ addEventListener("resize",()=>{ if(active) upload(curOff); });
   document.querySelectorAll('#proyectos .fig, .svc-card').forEach(makeTilt);
 
   // Also give a lighter magnetic to service cards (already done above)
+})();
+</script>
+
+<!-- MATRIX RAIN BACKGROUND (desde Sobre mí) -->
+<script>
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const canvas = document.getElementById('matrixBg');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Portfolio green: #85C528
+  const colors = { fg: [133, 197, 40], bg: [0, 0, 0], accent: [180, 255, 80] };
+  function rgbaStr(c, a){ return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+
+  let W = 0, H = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 1.5);
+    W = innerWidth;
+    H = innerHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  function thash(n) {
+    const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+    return s - Math.floor(s);
+  }
+
+  // Intensity / scale — sutil (~15-22% visible)
+  const intensity = 42;
+  const scale = 4.5;
+  let t = 0;
+  let active = false;
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgb(0,0,0)';
+    ctx.fillRect(0, 0, W, H);
+
+    const amp = intensity / 50;
+    const fontSize = Math.max(12, Math.floor(10 + scale * 2.1));
+    const colW = fontSize * 1.15; // un poco más de espacio entre columnas
+    const cols = Math.ceil(W / colW) + 1;
+    const chars = 'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÑñ¿?¡!@#$%';
+    const trailMax = 6 + Math.floor(amp * 10);
+
+    ctx.font = `bold ${fontSize}px monospace`;
+    ctx.textBaseline = 'top';
+
+    for (let col = 0; col < cols; col++) {
+      const speed = 1.1 + thash(col * 1.0) * 4.2;
+      const trail = 3 + Math.floor(thash(col * 2.3) * trailMax);
+      const offset = thash(col * 3.7) * H * 3;
+      const x = col * colW;
+      const totalH = H + trail * fontSize;
+      const headY = ((t * speed * fontSize * amp * 0.42 + offset) % totalH);
+
+      for (let i = 0; i < trail; i++) {
+        const y = headY - i * fontSize;
+        if (y < -fontSize || y > H) continue;
+
+        const fade = 1 - i / trail;
+        const alpha = fade * fade * 0.7;
+        if (alpha < 0.05) continue;
+
+        const ci = Math.floor(thash(col * 10 + i * 0.37 + Math.floor(t * 3.5) * 0.07) * chars.length);
+        const ch = chars[ci % chars.length];
+
+        ctx.save();
+        if (i < 2) {
+          ctx.shadowColor = rgbaStr(colors.accent, 0.55);
+          ctx.shadowBlur = 8;
+          ctx.fillStyle = rgbaStr(colors.accent, Math.min(0.95, alpha * 1.35));
+        } else {
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = rgbaStr(colors.fg, alpha);
+        }
+        ctx.fillText(ch, x, y);
+        ctx.restore();
+      }
+    }
+  }
+
+  function frame() {
+    if (active) {
+      t += 0.016 * 1.4;
+      drawMatrix();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Activar la lluvia al llegar a "Sobre mí"
+  const sobre = document.getElementById('sobre');
+  function updateVisibility() {
+    if (!sobre) return;
+    const rect = sobre.getBoundingClientRect();
+    // Aparece cuando el top de sobre está cerca del viewport
+    const shouldShow = rect.top < innerHeight * 0.85;
+    if (shouldShow && !active) {
+      active = true;
+      canvas.classList.add('on');
+    } else if (!shouldShow && active && scrollY < 50) {
+      // Solo apaga si volvemos al top del hero
+      active = false;
+      canvas.classList.remove('on');
+    }
+  }
+  addEventListener('scroll', updateVisibility, { passive: true });
+  updateVisibility();
+})();
+</script>
+
+<!-- PROMPT VIEWER -->
+<script>
+(() => {
+  const PROMPTS = {
+    1: `{
+  "camera": {
+    "shot": "PMC",
+    "main_lens": {
+      "description": "the person sitting",
+      "brand": "Nikon",
+      "lens": {
+        "type": "wide angle",
+        "focal_length_mm": 185
+      },
+      "effect": "movie"
+    },
+    "resolution": "4K"
+  },
+  "style": {
+    "filter": "action movie",
+    "color_tone": "high contrast, warm tones",
+    "focus": "main character's face and shoulder"
+  },
+  "background": {
+    "type": "sky",
+    "description": "clean blue, no clouds"
+  },
+  "subject": {
+    "type": "person",
+    "clothing": {
+      "top": "simple sweater",
+      "bottom": "black jeans"
+    },
+    "position": "sitting on Optimus Prime's left shoulder of 2009",
+    "visibility": "only half of face and part of chest"
+  },
+  "robot": {
+    "name": "Optimus Prime",
+    "focus_area": "left shoulder"
+  },
+  "composition": {
+    "framing": "PMC",
+    "depth": "clean background with soft blur",
+    "camera_angle": "medium shot with epic perspective"
+  },
+  "notes": "The scene should convey dynamic energy and cinematic aesthetics, with an emphasis on the relationship between the human character and Optimus Prime."
+}`,
+    2: `{
+  "prompt_details": {
+    "prompt": "Create a **professional editorial action photograph** featuring the person in **Image 1**. The subject is standing on a **wet, reflective surface**, dressed in a sharp **black suit**, and holding a **black 9mm pistol with a silencer** in their right hand. Their posture is weary but vigilant, observing the surroundings with **intense, silent tension**. The scene is cinematic, epic, and highly stylized, with several **blurred, armed figures aiming** at the subject from ambiguous, out-of-focus positions. The composition uses a tight, sharp focus on the character, with an **extreme shallow depth of field** that creates creamy, dramatic bokeh in the background. A single, strong, directional light source acts as a rim light, illuminating only the subject's edges and suit to enhance the emotional gravity and isolate them from the surrounding chaos.",
+    "style": "cinematic, editorial, dramatic lighting, intense shallow depth of field, high contrast, film grain",
+    "mood": "tense, heroic, exhausted, defiant, isolated",
+    "environment": "wet, reflective urban ground (street/alley), low ambient light, deeply blurred armed figures as background elements",
+    "focus": "sharp on the subject, high contrast, extreme emotional intensity"
+  },
+  "technical_image_settings": {
+    "lighting": {
+      "main_source": "Single, strong directional (spotlight/rim light) source on the subject's back/side.",
+      "ambience": "Low, diffused ambient light (blue-green tint for contrast).",
+      "effect": "Enhanced **rim lighting** on hair, suit edges, and metallic surfaces (gun/suit accessories), with a subtle backlighting haze to emphasize atmosphere."
+    },
+    "color_and_tone": {
+      "filter": "**Analog film emulation (35mm)** with a dominant **warm yellow-orange/amber tint** overlay.",
+      "shadows": "Boosted **blue-green** in the shadows for a cinematic teal and orange contrast; soft, diffused, low-contrast shadows to maintain melancholic depth, avoiding harsh edges.",
+      "highlights": "Subtle specular highlights on metallic and wet elements, bright edges on hair and fabric fringes, enhanced by warm amber tones."
+    },
+    "aesthetic_and_effects": {
+      "aesthetic": "**Vintage 1970s cinema look**, hazy and dreamlike quality, balanced color gradation favoring earth tones and deep blacks.",
+      "noise_texture": "**Fine-grained film texture** throughout, more pronounced in shadows and midtones for an organic, analog feel, minimal digital noise.",
+      "depth_of_field": "**Extreme shallow depth of field** with creamy, smooth bokeh on all background elements.",
+      "other_effects": "Subtle lens flare (from the rim light/backlight source), mild chromatic aberration at the edges, subtle vignette to draw focus."
+    },
+    "camera_settings": {
+      "camera_model": "Nikon Z9",
+      "lens": "**35mm wide-angle prime lens** (for full body shot)",
+      "resolution": "High resolution",
+      "camera_angle": "**Dutch Angle (25-30 degree tilt)**, combined with a **Slight Low-Angle** and a **Dorsal Shot (Slightly behind the subject)** to show their perspective and the looming threat.",
+      "format": "**16:9 cinematic widescreen**.",
+      "view": "**Full Shot (FS) / Plano Entero**, capturing the subject's entire body from head to feet."
+    }
+  }
+}`,
+    3: `Create a cinematic close-up of the subject in the image (use the facial expression from the selected image), staring into the camera with an intense, focused gaze that suggests defiance or confrontation. The scene takes place outdoors during a heavy snowfall, with fresh white flakes clinging to their dark, damp hair, eyelashes, and the shoulders of their thick, ribbed turtleneck and puffer jacket. Use dramatic, cool lighting to highlight the sharp angles of their face and the texture of the snow, capturing an atmosphere of raw resilience and harsh winter conditions. Focus on a very shallow depth of field to keep the eye sharp while blurring the background, making the viewer feel the proximity and intensity of the moment.`
+  };
+
+  const modal = document.getElementById('promptModal');
+  const codeEl = document.getElementById('promptCode');
+  const copyBtn = document.getElementById('promptCopy');
+  const closeBtn = document.getElementById('promptClose');
+  if (!modal || !codeEl) return;
+
+  let current = '';
+
+  function openPrompt(id) {
+    current = PROMPTS[id] || '';
+    codeEl.textContent = current;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    copyBtn.classList.remove('ok');
+    const label = (typeof T !== 'undefined' && T[lang]) ? T[lang].copyPrompt : 'Copiar prompt';
+    copyBtn.textContent = label;
+  }
+
+  function closePrompt() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.prompt-btn').forEach(btn => {
+    btn.addEventListener('click', () => openPrompt(btn.dataset.prompt));
+  });
+
+  closeBtn?.addEventListener('click', closePrompt);
+  modal.addEventListener('click', e => { if (e.target === modal) closePrompt(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closePrompt(); });
+
+  copyBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(current);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = current;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    copyBtn.classList.add('ok');
+    copyBtn.textContent = lang === 'en' ? 'Copied!' : '¡Copiado!';
+    setTimeout(() => {
+      copyBtn.classList.remove('ok');
+      copyBtn.textContent = (typeof T !== 'undefined' && T[lang]) ? T[lang].copyPrompt : 'Copiar prompt';
+    }, 1800);
+  });
 })();
 </script>
 
