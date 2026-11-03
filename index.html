@@ -67,12 +67,10 @@ section{position:relative;z-index:1;border-top:1px solid var(--line);padding:cla
 .tools-zone{
   position:relative;width:100%;
   height:clamp(220px,32vw,300px);
-  border:1px solid var(--line);border-radius:18px;
-  background-color:#0a0a0a;
-  background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1.3px);
-  background-size:20px 20px;overflow:hidden;
+  cursor:crosshair;touch-action:none;
 }
-.tools-zone canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
+.tools-zone canvas{position:absolute;pointer-events:none;z-index:0;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.tools-label,.tool-tabs{position:relative;z-index:1}
 .tool-tag{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35);pointer-events:none;transition:opacity .3s,transform .3s;font-family:'Space Grotesk',system-ui,sans-serif;font-weight:500}
 .tool-tag.out{opacity:0;transform:translate(-50%,6px)}
 .corner{position:absolute;width:10px;height:10px;border:1px solid rgba(133,197,40,.3);pointer-events:none}
@@ -312,8 +310,6 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
         <div class="tools-label" data-k="toolsLabel"></div>
         <div class="tools-zone" id="zone">
           <canvas id="cv" role="img" aria-label="Herramientas"></canvas>
-          <span class="corner tl"></span><span class="corner tr"></span>
-          <span class="corner bl"></span><span class="corner br"></span>
           <div class="tool-tag" id="tag"></div>
         </div>
         <div class="tool-tabs" id="tabs"></div>
@@ -713,7 +709,7 @@ document.addEventListener("touchmove", e=>{ if(e.touches.length > 1) e.preventDe
 <script>
 /* TRANSICIÓN HERO → SOBRE MÍ */
 (()=>{try{
-const FX={rug:1.45,grosor:3,escala:4.1,halo:3, sens:.0007, tsens:.0028};
+const FX={rug:1.45,grosor:3,escala:4.1,halo:3, sens:.0007, tsens:.0028, blur:.022, blurFin:.72};
 if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 const cv=document.getElementById("fx"), gl=cv.getContext("webgl",{alpha:true,premultipliedAlpha:true});
 if(!gl) return;
@@ -725,6 +721,13 @@ float h(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<5;i++){s+=a*n(p);p=p*2.03+vec2(17.1,9.7);a*=.5;}return s;}
+uniform float G;
+vec3 bl(vec2 u){
+ if(G<.5) return texture2D(B,u).rgb;
+ vec3 s=vec3(0.);float w=0.;
+ for(int i=-16;i<=16;i++){float f=float(i);float g=exp(-.5*f*f*.03515625);
+  s+=g*texture2D(B,u+vec2(0.,f*G*.1875/R.y)).rgb;w+=g;}
+ return s/w;}
 void main(){
  float asp=R.x/R.y;
  vec2 c=(v-vec2(.5,.5))*vec2(asp,1.); c*=1.02/(.5*length(vec2(asp,1.)));
@@ -735,7 +738,7 @@ void main(){
  float e=P*P*(3.-2.*P), Rr=mix(-.3,1.6,e), m=Rr-d;
  float inside=smoothstep(0.,.0015,m);
  vec3 G=vec3(.522,.773,.157);
- vec3 b=texture2D(B,(v-.5)/(1.14-P*.14)+.5).rgb;
+ vec3 b=bl((v-.5)/(1.14-P*.14)+.5);
  b+=G*smoothstep(.06,0.,m)*.2*K.z;
  float halo=exp(-max(-m,0.)*28.)*.08*K.z*smoothstep(-.3,0.,Rr)*step(m,0.);
  float wd=(.0012+.005*n(w*S*60.))*K.y;
@@ -749,7 +752,17 @@ void main(){
 const sh=(t,s)=>{const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);
  if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))console.error(gl.getShaderInfoLog(o));return o;};
 const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));
-gl.linkProgram(pr);gl.useProgram(pr);
+gl.bindAttribLocation(pr,0,"p");gl.linkProgram(pr);
+const FS2=`precision highp float;varying vec2 v;uniform sampler2D B;uniform vec2 D;uniform float G;
+void main(){
+ if(G<.5){gl_FragColor=vec4(texture2D(B,v).rgb,1.);return;}
+ vec3 s=vec3(0.);float w=0.;
+ for(int i=-16;i<=16;i++){float f=float(i);float g=exp(-.5*f*f*.03515625);
+  s+=g*texture2D(B,v+D*(f*G*.1875)).rgb;w+=g;}
+ gl_FragColor=vec4(s/w,1.);}`;
+const pr2=gl.createProgram();gl.attachShader(pr2,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr2,sh(gl.FRAGMENT_SHADER,FS2));
+gl.bindAttribLocation(pr2,0,"p");gl.linkProgram(pr2);
+gl.useProgram(pr);
 gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
 gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
 const loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
@@ -759,6 +772,14 @@ gl.bindTexture(gl.TEXTURE_2D,tex);
 [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER].forEach(f=>gl.texParameteri(gl.TEXTURE_2D,f,gl.LINEAR));
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
 gl.uniform3f(U("K"),FX.rug,FX.grosor,FX.halo);gl.uniform1f(U("S"),FX.escala);
+gl.uniform1i(U("B"),1);
+const tex2=gl.createTexture(), fbo=gl.createFramebuffer(), U2=k=>gl.getUniformLocation(pr2,k);
+gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,tex2);
+[gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T].forEach(w=>gl.texParameteri(gl.TEXTURE_2D,w,gl.CLAMP_TO_EDGE));
+[gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER].forEach(f=>gl.texParameteri(gl.TEXTURE_2D,f,gl.LINEAR));
+gl.activeTexture(gl.TEXTURE0);
+gl.useProgram(pr2);gl.uniform1i(U2("B"),0);gl.useProgram(pr);
+const sm=(a,b,x)=>{x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x);};
 
 function drawAbout(off){off=off||0;
   const k=Math.min(devicePixelRatio||1,1.5), W=Math.round(innerWidth*k), H=Math.round(innerHeight*k);
@@ -792,7 +813,12 @@ const atTop=()=>scrollY<=2;
 let curOff=0;
 function upload(off){
   const img=drawAbout(off);cv.width=img.width;cv.height=img.height;gl.viewport(0,0,cv.width,cv.height);
+  gl.useProgram(pr);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);
   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);gl.uniform2f(U("R"),cv.width,cv.height);
+  gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,tex2);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,cv.width,cv.height,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex2,0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.activeTexture(gl.TEXTURE0);
 }
 function begin(p,off){
   curOff=off||0;upload(curOff);cv.style.display="block";active=true;cur=target=p;last=performance.now();
@@ -808,6 +834,11 @@ function frame(t){
   const dt=Math.min((t-last)/1000||.016,.05);last=t;
   cur+=(target-cur)*(1-Math.exp(-dt*6));
   if(target>=1&&cur>.996)cur=1; if(target<=0&&cur<.004)cur=0;
+  const sig=FX.blur*cv.height*.5*sm(0,.06,cur)*(1-sm(FX.blurFin,1,cur));
+  gl.useProgram(pr2);gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);
+  gl.uniform2f(U2("D"),1/cv.width,0);gl.uniform1f(U2("G"),sig);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+  gl.useProgram(pr);gl.uniform1f(U("G"),sig);
   gl.uniform1f(U("P"),cur);gl.uniform1f(U("T"),t/1000);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
   if(cur>=1&&target>=1) return end(true);
   if(cur<=0&&target<=0) return end(false);
@@ -872,13 +903,13 @@ addEventListener("resize",()=>{ if(active) upload(curOff); });
     { name: 'Gemini',           color: '#7B9AFF', tag: 'Asistente IA' },
     { name: 'Claude',           color: '#D97757', tag: 'Asistente IA' },
   ];
-  const DENSITY = 4, AUTOPLAY_MS = 4800, MOUSE_RADIUS = 75;
+  const DENSITY = 4, AUTOPLAY_MS = 4800, MOUSE_RADIUS = 75, PAD = 150;
   const MAX_PARTICLES = innerWidth < 640 ? 1300 : 2600;
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const zone = document.getElementById('zone'), cv = document.getElementById('cv');
   const ctx = cv.getContext('2d'), tag = document.getElementById('tag'), tabsEl = document.getElementById('tabs');
   const DPR = Math.min(devicePixelRatio || 1, 2);
-  let W = 0, H = 0;
+  let W = 0, H = 0, PL = 0, PR = 0, CW = 0, CH = 0;
   const rand = (a,b) => a + Math.random()*(b-a);
   function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
   function hexToRgb(hex){const n=parseInt(hex.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255];}
@@ -892,7 +923,7 @@ addEventListener("resize",()=>{ if(active) upload(curOff); });
     c.fillStyle=grad;c.fillRect(0,0,32,32);sprites.set(color,s);return s;
   }
   const particles=[];
-  function initParticles(){for(let i=0;i<MAX_PARTICLES;i++){particles.push({x:rand(0,W),y:rand(0,H),vx:0,vy:0,tx:0,ty:0,size:rand(0.85,2.2),phase:rand(0,Math.PI*2),delay:0,mode:'dust',img:null,dustA:rand(0.05,0.12)});}}
+  function initParticles(){for(let i=0;i<MAX_PARTICLES;i++){particles.push({x:rand(-PL,W+PR),y:rand(-PAD,H+PAD),vx:0,vy:0,tx:0,ty:0,size:rand(0.85,2.2),phase:rand(0,Math.PI*2),delay:0,mode:'dust',img:null,dustA:rand(0.05,0.12)});}}
   const off=document.createElement('canvas'), octx=off.getContext('2d',{willReadFrequently:true});
   const FONT="'Space Grotesk',sans-serif";
   function layout(text){
@@ -930,15 +961,15 @@ addEventListener("resize",()=>{ if(active) upload(curOff); });
     setTimeout(()=>{tag.textContent=tool.tag;tag.classList.remove('out');},250);
   }
   const mouse={x:-9e3,y:-9e3};
-  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
-  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-9e3;});
+  addEventListener('pointermove',e=>{const r=zone.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;},{passive:true});
+  document.documentElement.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-9e3;});
   let t=0;
   function frame(){
-    t+=0.016;ctx.clearRect(0,0,W,H);drawLinks();ctx.globalCompositeOperation='lighter';
+    t+=0.016;ctx.clearRect(-PL,-PAD,CW,CH);drawLinks();ctx.globalCompositeOperation='lighter';
     for(const p of particles){
       if(p.delay>0) p.delay--;
       if(p.mode==='text'){if(p.delay===0){p.vx+=(p.tx-p.x)*0.025;p.vy+=(p.ty-p.y)*0.025;p.vx+=rand(-0.01,0.01);}}
-      else{p.vy-=0.002;p.vx+=Math.sin(t*0.5+p.phase)*0.003;if(p.y<-12)p.y=H+12;if(p.x<-12)p.x=W+12;else if(p.x>W+12)p.x=-12;}
+      else{p.vy-=0.002;p.vx+=Math.sin(t*0.5+p.phase)*0.003;if(p.y<-PAD)p.y=H+PAD;if(p.x<-PL)p.x=W+PR;else if(p.x>W+PR)p.x=-PL;}
       const dx=p.x-mouse.x,dy=p.y-mouse.y,d2=dx*dx+dy*dy;
       if(d2<MOUSE_RADIUS*MOUSE_RADIUS){const d=Math.sqrt(d2)||1,f=((MOUSE_RADIUS-d)/MOUSE_RADIUS)*0.8;p.vx+=(dx/d)*f;p.vy+=(dy/d)*f;}
       p.vx*=0.9;p.vy*=0.9;p.x+=p.vx;p.y+=p.vy;
@@ -961,7 +992,12 @@ addEventListener("resize",()=>{ if(active) upload(curOff); });
   let timer=null;
   function schedule(){clearTimeout(timer);timer=setTimeout(()=>{morphTo((current+1)%TOOLS.length,true);schedule();},AUTOPLAY_MS);}
   TOOLS.forEach((tool,i)=>{const b=document.createElement('button');b.className='tool-tab';b.type='button';b.textContent=tool.name;b.addEventListener('click',()=>{morphTo(i,true);schedule();});tabsEl.appendChild(b);});
-  function resize(){const r=zone.getBoundingClientRect();W=Math.max(1,Math.floor(r.width));H=Math.max(1,Math.floor(r.height));cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);if(current>=0)morphTo(current,false);}
+  function resize(){const r=zone.getBoundingClientRect();W=Math.max(1,Math.floor(r.width));H=Math.max(1,Math.floor(r.height));
+    PL=Math.max(0,Math.min(PAD,Math.floor(r.left)));PR=Math.max(0,Math.min(PAD,Math.floor(innerWidth-r.right)));CW=W+PL+PR;CH=H+PAD*2;
+    cv.width=CW*DPR;cv.height=CH*DPR;cv.style.left=-PL+'px';cv.style.top=-PAD+'px';cv.style.width=CW+'px';cv.style.height=CH+'px';
+    const m='linear-gradient(to right,transparent 0,#000 '+PL+'px,#000 calc(100% - '+PR+'px),transparent 100%),linear-gradient(to bottom,transparent 0,#000 '+PAD+'px,#000 calc(100% - '+PAD+'px),transparent 100%)';
+    cv.style.webkitMaskImage=cv.style.maskImage=m;cv.style.webkitMaskComposite='source-in';cv.style.maskComposite='intersect';
+    ctx.setTransform(DPR,0,0,DPR,PL*DPR,PAD*DPR);if(current>=0)morphTo(current,false);}
   addEventListener('resize',resize);
   requestAnimationFrame(()=>{resize();initParticles();morphTo(0,false);schedule();document.fonts?.ready.then(()=>morphTo(current,false));requestAnimationFrame(frame);});
 })();
