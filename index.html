@@ -110,6 +110,21 @@ section{position:relative;z-index:1;border-top:1px solid var(--line);padding:cla
 .meta{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;align-items:baseline}
 .meta h3{font-size:clamp(22px,3vw,40px);font-weight:600;letter-spacing:-.02em}
 .meta p{color:var(--dim);max-width:42ch;font-size:14px}
+.meta-l{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{font-size:11px;font-weight:600;letter-spacing:.04em;padding:4px 10px;border:1px solid var(--line);border-radius:99px;color:rgba(255,255,255,.7);white-space:nowrap}
+.badge.on{color:var(--g);border-color:rgba(133,197,40,.5);background:rgba(133,197,40,.08)}
+.cell .cap{margin:9px 0 0;display:flex;gap:8px;align-items:baseline}
+.cell .cap i{font-style:normal;color:var(--g);font-weight:600;font-size:11px;letter-spacing:.06em}
+.specs{display:grid;grid-template-columns:1.5fr 1.2fr 1fr;gap:clamp(18px,3vw,40px);margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.specs h4{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips span{border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:12px;font-weight:600;color:rgba(255,255,255,.75)}
+.chips span.ai{border-style:dashed}
+.specs .note{font-size:11px;color:var(--dim);margin-top:9px}
+.sw{display:flex;gap:8px}
+.sw i{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.18);display:block}
+@media(max-width:900px){.specs{grid-template-columns:1fr;gap:18px}}
 .fig{position:relative;overflow:hidden;background:#111;min-height:100px;border-radius:4px}
 .fig img{display:block;width:100%;height:100%;object-fit:cover}
 .fig.empty img{display:none}
@@ -121,6 +136,8 @@ section{position:relative;z-index:1;border-top:1px solid var(--line);padding:cla
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1.1vw,14px)}
 .pair .fig{aspect-ratio:4/5}
 .cap{font-size:12px;color:var(--dim);margin:7px 0 18px}
+.prompt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:clamp(28px,3.5vw,44px) clamp(18px,2.4vw,32px)}
+.prompt-grid .prompt-set{margin-bottom:0}
 .prompt-set{margin-bottom:clamp(36px,5vw,64px)}
 .prompt-set:last-child{margin-bottom:0}
 .prompt-btn{
@@ -178,7 +195,7 @@ footer{padding:24px 0;border-top:1px solid var(--line);font-size:12px;color:var(
   .svc-grid{gap:0}
   .g4{grid-template-columns:repeat(2,1fr)}
   .g3{grid-template-columns:1fr 1fr}
-  .g2,.pair{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
   /* HERO MOBILE: el escenario queda fijo para que la foto y sus efectos no salten */
   .hero{
     --ph:68%;
@@ -266,6 +283,30 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
 }
 
 </style>
+<style>
+/* VISOR DE IMÁGENES */
+#proyectos .fig:not(.empty){cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:100;display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:minmax(0,1fr) auto;align-items:center;background:rgba(0,0,0,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .2s ease;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.lb[hidden],.lb-btn[hidden]{display:none}
+.lb.on{opacity:1}
+.lb-stage{grid-column:2;grid-row:1;display:grid;place-items:center;min-height:0;height:100%;padding:clamp(60px,9vh,84px) 0 8px}
+.lb-stage img{max-width:100%;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);width:auto;height:auto;object-fit:contain;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.6);transition:opacity .18s ease,transform .25s ease}
+.lb-stage img.out{opacity:0;transform:scale(.985)}
+.lb-btn{appearance:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;display:grid;place-items:center;cursor:pointer;padding:0;transition:border-color .2s,color .2s,background .2s}
+.lb-btn:hover{color:var(--g);border-color:var(--g);background:rgba(133,197,40,.08)}
+.lb-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lb-prev{grid-column:1;grid-row:1;margin:0 clamp(8px,2vw,24px)}
+.lb-next{grid-column:3;grid-row:1;margin:0 clamp(8px,2vw,24px)}
+.lb-close{position:absolute;top:calc(14px + env(safe-area-inset-top));right:clamp(14px,3vw,28px);z-index:2}
+.lb-bar{grid-column:1/-1;grid-row:2;display:flex;justify-content:space-between;gap:16px;padding:10px clamp(18px,4vw,56px) 16px;font-size:13px;color:var(--dim)}
+.lb-bar #lbCount{font-variant-numeric:tabular-nums;color:var(--g);font-weight:600;white-space:nowrap}
+@media(max-width:700px){
+  .lb{grid-template-columns:1fr}
+  .lb-stage{grid-column:1}
+  .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);margin:0;background:rgba(0,0,0,.55);z-index:2}
+  .lb-prev{left:8px}.lb-next{right:8px}
+}
+</style>
 </head>
 <body>
 <canvas id="matrixBg" aria-hidden="true"></canvas>
@@ -289,7 +330,6 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
   <div class="soc">
     <a href="mailto:facarreronava@gmail.com">Email</a>
     <a class="soc-center" href="https://www.behance.net/ffernando" target="_blank" rel="noopener">Behance</a>
-    <a href="https://instagram.com/ferxdesing" target="_blank" rel="noopener">Instagram</a>
   </div>
   <button id="gyro" type="button" hidden data-k="gyro"></button>
   <div id="gyroMsg" hidden data-k="gyroOff"></div>
@@ -372,20 +412,36 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
     </div>
 
     <div class="project">
-      <div class="meta"><h3>Deli Lunas</h3><p data-k="deliDesc"></p></div>
+      <div class="meta">
+        <div class="meta-l"><h3>Deli Lunas</h3><div class="badges"><span class="badge" data-k="stConcept"></span><span class="badge">2024</span></div></div>
+        <p data-k="deliDesc"></p>
+      </div>
       <div class="grid g3">
-        <div class="fig" data-key="deli1"><img data-img="deli1" alt="Logo Deli Lunas"></div>
-        <div class="fig" data-key="deli2"><img data-img="deli2" alt="Empaque Deli Lunas"></div>
-        <div class="fig" data-key="deli3"><img data-img="deli3" alt="Merchandising Deli Lunas"></div>
+        <div class="cell"><div class="fig" data-key="deli1"><img data-img="deli1" alt="Logo Deli Lunas"></div><p class="cap"><i>01</i><span data-k="capLogo"></span></p></div>
+        <div class="cell"><div class="fig" data-key="deli2"><img data-img="deli2" alt="Empaque Deli Lunas"></div><p class="cap"><i>02</i><span data-k="capPack"></span></p></div>
+        <div class="cell"><div class="fig" data-key="deli3"><img data-img="deli3" alt="Uniforme Deli Lunas"></div><p class="cap"><i>03</i><span data-k="capUniform"></span></p></div>
+      </div>
+      <div class="specs">
+        <div><h4 data-k="spDeliv"></h4><div class="chips"><span data-k="dLogo"></span><span data-k="dPalette"></span><span data-k="dPack"></span><span data-k="dUniform"></span><span data-k="dManual"></span></div></div>
+        <div><h4 data-k="spTools"></h4><div class="chips"><span>Photoshop</span><span>Illustrator</span><span class="ai">ChatGPT</span><span class="ai">Flow · Google</span></div><p class="note" data-k="spAiNote"></p></div>
+        <div><h4 data-k="spPalette"></h4><div class="sw"><i style="background:#C72242" title="#C72242"></i><i style="background:#C15228" title="#C15228"></i><i style="background:#E04E2D" title="#E04E2D"></i><i style="background:#F0C99E" title="#F0C99E"></i></div></div>
       </div>
     </div>
 
     <div class="project">
-      <div class="meta"><h3>Ponq Citoz</h3><p data-k="ponqDesc"></p></div>
+      <div class="meta">
+        <div class="meta-l"><h3>Ponq Citoz</h3><div class="badges"><span class="badge on" data-k="stReal"></span><span class="badge">2025</span><span class="badge" data-k="stLaunch"></span></div></div>
+        <p data-k="ponqDesc"></p>
+      </div>
       <div class="grid g3">
-        <div class="fig" data-key="ponq1"><img data-img="ponq1" alt="Logo Ponq Citoz"></div>
-        <div class="fig" data-key="ponq2"><img data-img="ponq2" alt="Empaque Ponq Citoz"></div>
-        <div class="fig" data-key="ponq3"><img data-img="ponq3" alt="Aplicaciones Ponq Citoz"></div>
+        <div class="cell"><div class="fig" data-key="ponq1"><img data-img="ponq1" alt="Logo Ponq Citoz"></div><p class="cap"><i>01</i><span data-k="capLogoTag"></span></p></div>
+        <div class="cell"><div class="fig" data-key="ponq2"><img data-img="ponq2" alt="Empaque Ponq Citoz"></div><p class="cap"><i>02</i><span data-k="capPack"></span></p></div>
+        <div class="cell"><div class="fig" data-key="ponq3"><img data-img="ponq3" alt="Aplicaciones Ponq Citoz"></div><p class="cap"><i>03</i><span data-k="capApps"></span></p></div>
+      </div>
+      <div class="specs">
+        <div><h4 data-k="spDeliv"></h4><div class="chips"><span data-k="dLogo"></span><span data-k="dTagline"></span><span data-k="dPalette"></span><span data-k="dPattern"></span><span data-k="dUniform"></span><span data-k="dManual"></span></div></div>
+        <div><h4 data-k="spTools"></h4><div class="chips"><span>Photoshop</span><span>Illustrator</span><span class="ai">ChatGPT</span><span class="ai">Flow · Google</span></div><p class="note" data-k="spAiNote"></p></div>
+        <div><h4 data-k="spPalette"></h4><div class="sw"><i style="background:#FFB211" title="#FFB211"></i><i style="background:#F2902E" title="#F2902E"></i><i style="background:#FFFFFF" title="#FFFFFF"></i></div></div>
       </div>
     </div>
 
@@ -406,6 +462,7 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
     <div class="project">
       <div class="meta"><h3 data-k="promptTitle"></h3><p data-k="promptDesc"></p></div>
 
+      <div class="prompt-grid">
       <!-- Prompt 1: Optimus -->
       <div class="prompt-set">
         <div class="pair">
@@ -432,6 +489,7 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
         </div>
         <button type="button" class="prompt-btn" data-prompt="3" data-k="viewPrompt"></button>
       </div>
+      </div>
     </div>
   </div>
 </section>
@@ -456,7 +514,6 @@ nav{padding-top:calc(16px + env(safe-area-inset-top));padding-left:max(clamp(18p
     <a class="mail" href="mailto:facarreronava@gmail.com">facarreronava@gmail.com</a>
     <div class="info">
       <a href="https://wa.me/584247002877" target="_blank" rel="noopener">+58 424 700 2877</a>
-      <a href="https://instagram.com/srcarrero" target="_blank" rel="noopener">@srcarrero</a>
       <span>Venezuela</span>
     </div>
   </div>
@@ -508,8 +565,12 @@ es:{
   s4t:"IA generativa y prompts",s4d:"Imágenes, texturas y mockups con Midjourney, Gemini, Flow y Stable Diffusion, con prompts pensados para controlar el resultado.",
   webTitle:"Tienda online",webDesc:"Diseño y desarrollo visual de la tienda de mi marca de camisetas gráficas inspiradas en anime, series y cultura pop.",
   visit:"Visitar calle114.com",
-  deliDesc:"Identidad completa para una marca de repostería: logo, empaque y uniformes.",
-  ponqDesc:"Identidad con mascota para una marca de ponqués: logo, empaques y aplicaciones.",
+  stReal:"Proyecto real",stConcept:"Conceptual",stLaunch:"Lanzado en su local",
+  spDeliv:"Entregables",spTools:"Herramientas",spPalette:"Paleta",spAiNote:"IA (borde punteado): análisis y mockups",
+  dLogo:"Logo",dTagline:"Tagline",dPalette:"Paleta",dPattern:"Patrón de empaque",dPack:"Empaque",dUniform:"Uniformes",dManual:"Manual de marca",
+  capLogoTag:"Logo y tagline",capPack:"Empaque",capApps:"Aplicaciones y uniformes",capLogo:"Logo",capUniform:"Uniforme",
+  deliDesc:"Identidad de marca para una repostería.",
+  ponqDesc:"Identidad de marca para una ponquería, con un zorro como mascota.",
   posterDesc:"Selección de posters de exploración visual, tipografía y narrativa.",
   promptTitle:"Creador de prompts",promptDesc:"Parto de una imagen original y, con prompts, la llevo a otro escenario o estilo manteniendo el detalle.",
   orig:"Original",ai:"Resultado con IA",
@@ -539,8 +600,12 @@ en:{
   s4t:"Generative AI & prompts",s4d:"Images, textures and mockups with Midjourney, Gemini, Flow and Stable Diffusion, using prompts built to control the outcome.",
   webTitle:"Online store",webDesc:"Visual design and build of the store for my graphic-tee brand inspired by anime, series and pop culture.",
   visit:"Visit calle114.com",
-  deliDesc:"Full identity for a bakery brand: logo, packaging and uniforms.",
-  ponqDesc:"Mascot-led identity for a cake brand: logo, packaging and applications.",
+  stReal:"Real project",stConcept:"Concept",stLaunch:"Launched in their shop",
+  spDeliv:"Deliverables",spTools:"Tools",spPalette:"Palette",spAiNote:"AI (dashed outline): analysis and mockups",
+  dLogo:"Logo",dTagline:"Tagline",dPalette:"Palette",dPattern:"Packaging pattern",dPack:"Packaging",dUniform:"Uniforms",dManual:"Brand manual",
+  capLogoTag:"Logo & tagline",capPack:"Packaging",capApps:"Applications & uniforms",capLogo:"Logo",capUniform:"Uniform",
+  deliDesc:"Brand identity for a bakery.",
+  ponqDesc:"Brand identity for a cupcake shop, led by a fox mascot.",
   posterDesc:"A selection of posters exploring visuals, typography and narrative.",
   promptTitle:"Prompt creator",promptDesc:"I start from an original image and, through prompts, take it to a new scene or style while keeping the detail.",
   orig:"Original",ai:"AI result",
@@ -1360,6 +1425,98 @@ addEventListener("resize",()=>{ if(active) upload(curOff); });
       copyBtn.textContent = (typeof T !== 'undefined' && T[lang]) ? T[lang].copyPrompt : 'Copiar prompt';
     }, 1800);
   });
+})();
+</script>
+
+<!-- VISOR DE IMÁGENES -->
+<div id="lb" class="lb" role="dialog" aria-modal="true" hidden>
+  <button type="button" class="lb-btn lb-close" id="lbClose"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <button type="button" class="lb-btn lb-prev" id="lbPrev"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <div class="lb-stage" id="lbStage"><img id="lbImg" alt=""></div>
+  <button type="button" class="lb-btn lb-next" id="lbNext"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <div class="lb-bar"><span id="lbCap"></span><span id="lbCount"></span></div>
+</div>
+<script>
+(() => {
+  const lb = document.getElementById('lb'), img = document.getElementById('lbImg');
+  const capEl = document.getElementById('lbCap'), cntEl = document.getElementById('lbCount');
+  const bClose = document.getElementById('lbClose'), bPrev = document.getElementById('lbPrev'), bNext = document.getElementById('lbNext');
+  const L = { es:{open:'Ampliar imagen',close:'Cerrar',prev:'Anterior',next:'Siguiente'}, en:{open:'Enlarge image',close:'Close',prev:'Previous',next:'Next'} };
+  const t = k => L[(typeof lang !== 'undefined' && lang === 'en') ? 'en' : 'es'][k];
+  const SEL = '#proyectos .fig';
+  const valid = f => !f.classList.contains('empty') && f.querySelector('img');
+  let items = [], i = 0, opener = null, x0 = 0, y0 = 0;
+
+  function labels(){
+    bClose.setAttribute('aria-label', t('close')); bPrev.setAttribute('aria-label', t('prev')); bNext.setAttribute('aria-label', t('next'));
+    lb.setAttribute('aria-label', t('open'));
+    document.querySelectorAll(SEL).forEach(f => {
+      f.tabIndex = 0; f.setAttribute('role', 'button');
+      f.setAttribute('aria-label', t('open') + ': ' + (f.querySelector('img')?.alt || ''));
+    });
+  }
+  function caption(f){
+    const proj = f.closest('.project'), h = proj && proj.querySelector('.meta h3');
+    const c = f.nextElementSibling && f.nextElementSibling.classList.contains('cap') ? f.nextElementSibling : null;
+    const ct = c ? ((c.querySelector('[data-k]') || c).textContent || '').trim() : '';
+    return [h ? h.textContent.trim() : '', ct].filter(Boolean).join(' · ');
+  }
+  function show(n){
+    i = (n + items.length) % items.length;
+    const f = items[i], im = f.querySelector('img');
+    const done = () => img.classList.remove('out');
+    img.classList.add('out'); img.onload = done; img.onerror = done;
+    img.alt = im.alt; img.src = im.currentSrc || im.src;
+    if (img.complete) done();
+    capEl.textContent = caption(f);
+    cntEl.textContent = items.length > 1 ? (i + 1) + ' / ' + items.length : '';
+    bPrev.hidden = bNext.hidden = items.length < 2;
+    [1, -1].forEach(d => { const o = items[(i + d + items.length) % items.length].querySelector('img'); if (o) new Image().src = o.currentSrc || o.src; });
+  }
+  function open(f){
+    const g = f.closest('.prompt-set, .grid');
+    items = [...(g || f.parentElement).querySelectorAll('.fig')].filter(valid);
+    if (!items.length) return;
+    opener = f; labels();
+    lb.hidden = false; document.body.style.overflow = 'hidden';
+    show(items.indexOf(f));
+    requestAnimationFrame(() => lb.classList.add('on'));
+    bClose.focus({preventScroll: true});
+  }
+  function close(){
+    if (lb.hidden) return;
+    lb.classList.remove('on'); document.body.style.overflow = '';
+    setTimeout(() => { lb.hidden = true; img.removeAttribute('src'); }, 200);
+    if (opener) opener.focus({preventScroll: true});
+  }
+  document.addEventListener('click', e => {
+    const f = e.target.closest(SEL);
+    if (f && valid(f)) open(f);
+  });
+  lb.addEventListener('click', e => { if (e.target === lb || e.target.id === 'lbStage') close(); });
+  bClose.onclick = close; bPrev.onclick = () => show(i - 1); bNext.onclick = () => show(i + 1);
+  document.addEventListener('keydown', e => {
+    if (lb.hidden) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches(SEL) && valid(e.target)) { e.preventDefault(); open(e.target); }
+      return;
+    }
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(i - 1);
+    else if (e.key === 'ArrowRight') show(i + 1);
+    else if (e.key === 'Tab') {
+      const b = [bClose, bPrev, bNext].filter(x => !x.hidden), k = b.indexOf(document.activeElement);
+      e.preventDefault(); b[(k + (e.shiftKey ? -1 : 1) + b.length) % b.length].focus();
+    }
+  });
+  lb.addEventListener('wheel', e => e.stopPropagation(), {passive: true});
+  lb.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, {passive: true});
+  lb.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) show(i + (dx < 0 ? 1 : -1));
+  }, {passive: true});
+  const langBtn = document.getElementById('lang');
+  if (langBtn) langBtn.addEventListener('click', () => setTimeout(labels, 0));
+  labels();
 })();
 </script>
 
